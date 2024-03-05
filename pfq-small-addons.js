@@ -23,18 +23,15 @@
 
     $.each(timelineEntries, function(index) {
         const text = $(this).text();
-        console.log("Anfang", linkToRead, userName, hasOT);
 
         if (text.includes("Adopted")) {
             // If it was adopted, the adopter is the new OT
             linkToRead = $(this).find("a").attr("href");
             userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
-            console.log("Adopted", linkToRead, userName, hasOT);
             return false;
         } else if (text.includes("Released") && index === 0) {
             // If it was released to shelter as the last entry, it has no OT
             hasOT = false;
-            console.log("Released", linkToRead, userName, hasOT);
             return false;
         }
     });
@@ -43,7 +40,6 @@
     if (linkToRead === null) {
         linkToRead = timelineEntries.last().find("a").attr("href");
         userName = $(this).find("a").attr("href");
-        console.log("Kein OT", linkToRead, userName, hasOT);
     }
 
 
