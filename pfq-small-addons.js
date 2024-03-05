@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         PokéFarm Small Addnos
+// @name         PokéFarm Small Addons
 // @namespace    https://github.com/Vanyar92
 // @author       Vanyar
 // @homepageURL  https://github.com/Vanyar92/pfq-small-addons
