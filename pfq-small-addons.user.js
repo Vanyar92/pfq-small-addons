@@ -22,18 +22,23 @@
     let userName = null;
 
     $.each(timelineEntries, function(index) {
-        const text = $(this).text();
+        const text = $(this).text().toUpperCase();
 
-        if (text.includes("Released") && index === 0) {
+        if (text.includes("RELEASED")) {
             // If it was released to shelter as the last entry, it has no OT
             hasOT = false;
             return false;
-        } else if (text.includes("Adopted")) {
+        } else if (text.includes("SHELTER")) {
+            // This handles eggs that were released into the Shelter and hatched there
+            hasOT = false;
+            return false;
+        } else if (text.includes("ADOPTED")) {
             // If it was adopted, the adopter is the new OT
             linkToRead = $(this).find("a").attr("href");
             userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
             return false;
-        } else if (linkToRead === null && text.includes("hatched")) {
+        } else if (linkToRead === null && text.includes("HATCHED")) {
+            // If it was never released, the one who hatched the egg is the OT
             linkToRead = $(this).find("a").attr("href");
             userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
         }
