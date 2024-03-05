@@ -24,23 +24,20 @@
     $.each(timelineEntries, function(index) {
         const text = $(this).text();
 
-        if (text.includes("Adopted")) {
+        if (text.includes("Released") && index === 0) {
+            // If it was released to shelter as the last entry, it has no OT
+            hasOT = false;
+            return false;
+        } else if (text.includes("Adopted")) {
             // If it was adopted, the adopter is the new OT
             linkToRead = $(this).find("a").attr("href");
             userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
             return false;
-        } else if (text.includes("Released") && index === 0) {
-            // If it was released to shelter as the last entry, it has no OT
-            hasOT = false;
-            return false;
+        } else if (linkToRead === null && text.includes("hatched")) {
+            linkToRead = $(this).find("a").attr("href");
+            userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
         }
     });
-
-    // If it hasnt been adopted or released at all, set the first entry as OT
-    if (linkToRead === null) {
-        linkToRead = timelineEntries.last().find("a").attr("href");
-        userName = $(this).find("a").attr("href");
-    }
 
 
     // ---------------------------------------------------------------------------------------------------- //
