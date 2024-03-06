@@ -3,8 +3,8 @@
 // @namespace    https://github.com/Vanyar92
 // @author       Vanyar
 // @homepageURL  https://github.com/Vanyar92/pfq-small-addons
-// @downloadURL  https://github.com/Vanyar92/pfq-small-addons/raw/main/pfq-small-addons.js
-// @updateURL    https://github.com/Vanyar92/pfq-small-addons/raw/main/pfq-small-addons.js
+// @downloadURL  https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
+// @updateURL    https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @description  Some small addons to Pokéfarm
 // @version      1.0.0
 // @match        https://pokefarm.com/summary/*
@@ -24,7 +24,12 @@
     $.each(timelineEntries, function(index) {
         const text = $(this).text().toUpperCase();
 
-        if (text.includes("RELEASED")) {
+        if (text.includes("ADOPTED")) {
+            // If it was adopted, the adopter is the new OT
+            linkToRead = $(this).find("a").attr("href");
+            userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
+            return false;
+        } else if (text.includes("RELEASED")) {
             // If it was released to shelter as the last entry, it has no OT
             hasOT = false;
             return false;
@@ -32,15 +37,11 @@
             // This handles eggs that were released into the Shelter and hatched there
             hasOT = false;
             return false;
-        } else if (text.includes("ADOPTED")) {
-            // If it was adopted, the adopter is the new OT
-            linkToRead = $(this).find("a").attr("href");
-            userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
-            return false;
-        } else if (linkToRead === null && text.includes("HATCHED")) {
+        } else if (linkToRead === null && text.includes("EGG HATCHED")) {
             // If it was never released, the one who hatched the egg is the OT
             linkToRead = $(this).find("a").attr("href");
             userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
+            return false;
         }
     });
 
