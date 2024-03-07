@@ -6,7 +6,7 @@
 // @downloadURL  https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @updateURL    https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @description  Some small addons to Pokéfarm
-// @version      1.0.0
+// @version      1.0.1
 // @match        https://pokefarm.com/summary/*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js
 // ==/UserScript==
