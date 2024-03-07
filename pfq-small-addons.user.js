@@ -37,6 +37,11 @@
             // This handles eggs that were released into the Shelter and hatched there
             hasOT = false;
             return false;
+        } else if (text.includes("REVIVED")) {
+            // Handles never traded fossils
+            linkToRead = $(this).find("a").attr("href");
+            userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
+            return false;
         } else if (linkToRead === null && text.includes("EGG HATCHED")) {
             // If it was never released, the one who hatched the egg is the OT
             linkToRead = $(this).find("a").attr("href");
