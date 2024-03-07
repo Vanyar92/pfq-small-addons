@@ -6,7 +6,7 @@
 // @downloadURL  https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @updateURL    https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @description  Some small addons to Pokéfarm
-// @version      1.0.2
+// @version      1.0.3
 // @match        https://pokefarm.com/summary/*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js
 // ==/UserScript==
@@ -15,7 +15,7 @@
     "use strict";
     // ---------------------------------------------------------------------------------------------------- //
 
-    // Getting the OT
+    // Variables
     const timelineEntries = $("#timeline li");
     let hasOT = true;
     let linkToRead = null;
@@ -39,21 +39,12 @@
                 linkToRead = $(this).find("a").attr("href");
                 userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
                 return false;
-            } else if (text.includes("RELEASED")) {
-                // If it was released to shelter as the last entry, it has no OT
-                hasOT = false;
-                return false;
             } else if (text.includes("SHELTER")) {
-                // This handles eggs that were released into the Shelter and hatched there
+                // If last entry was regarding shelter, it has no OT
                 hasOT = false;
                 return false;
-            } else if (text.includes("REVIVED")) {
-                // Handles never traded fossils
-                linkToRead = $(this).find("a").attr("href");
-                userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
-                return false;
-            } else if (linkToRead === null && text.includes("EGG HATCHED")) {
-                // If it was never released, the one who hatched the egg is the OT
+            } else if (["REVIVED", "CAUGHT", "EGG HATCHED"].some(firstot => text.includes(firstot))) {
+                // If it was never released, the one who got the pokemon first is the OT
                 linkToRead = $(this).find("a").attr("href");
                 userName = linkToRead.substring(linkToRead.lastIndexOf('/') + 1);
                 return false;
