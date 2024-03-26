@@ -6,12 +6,12 @@
 // @downloadURL  https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @updateURL    https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @description  Some small addons to Pokéfarm
-// @version      1.1.1
+// @version      1.1.2
 // @match        https://pokefarm.com/*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js
 // ==/UserScript==
 
-window.addEventListener('load', insertOT, setupObserver)
+window.addEventListener('load', setupObserver)
 
 // Variables
 let timelineEntries = $("#timeline li");
@@ -19,6 +19,7 @@ let userName = null;
 let hasOT = true;
 let linkToRead = null;
 let getBonus = false;
+const currentPageUrl = window.location.href;
 
 // Function for figuring out the OT to use on different pages
 function determineOT(data) {
@@ -37,7 +38,8 @@ function determineOT(data) {
 
     // If it was traded to you, there is a breeding bonus
     const lastEntry = timelineEntries.first();
-    if (lastEntry.text().toUpperCase().includes("TRADE")) {
+    getBonus = false;
+    if (lastEntry.text().toUpperCase().includes("TRADE") && currentPageUrl.endsWith("daycare")) {
         getBonus = true;
     }
 
@@ -86,14 +88,13 @@ function insertOT() {
     determineOT(timelineEntries);
     const insertloc = $("#pkmnspecdata > p:contains('Parents')");
     const otText = hasOT ?
-      `<p><b>OT:</b> <a href="${linkToRead}">${userName}</a>${getBonus ? ' (Breeding bonus)' : ''}</p>` :
+      `<p><b>OT:</b> <a href="${linkToRead}">${userName}</a></p>` :
       '<p><b>OT:</b> None</p>';
 
     insertloc.before(otText);
 
 
-
-    // Inserting the OT into the fields page
+    // Inserting the OT into the fields and daycare pages
     $('.fieldmon').each(function () {
         const $fieldmon = $(this);
 
@@ -111,7 +112,7 @@ function insertOT() {
 
                 // Insert the OT
                 const fieldOT = hasOT ?
-                `<pdiv><b>OT:</b> <a href="${linkToRead}">${userName}</a>${getBonus ? ' (Breeding bonus)' : ''}</divp>` :
+                `<div><b>OT:</b> <a href="${linkToRead}">${userName}</a>${getBonus ? ' (Breeding bonus)' : ''}</div>` :
                 '<div><b>OT:</b> None</div>';
 
                 const fieldOTLoc = $fieldmon.nextAll('.tooltip_content').first().find('.fieldmontip').find('.item');
@@ -120,6 +121,41 @@ function insertOT() {
             } // success function
         }); // ajax
     }) // each function
+
+
+    // Inserting the OT into the party inside the fields
+    $('.slot').each(function () {
+        const $partymon = $(this);
+
+        // If a party slot is empty, there should be no ajax request
+        if ($partymon.children().length === 0) {
+            return;
+        }
+
+        // Get the url for the current pokemon using data-id
+        let dataId = $partymon.attr("data-id");
+        let summaryUrl = `https://pokefarm.com/summary/${dataId}`;
+
+        // Run a function to get the OT from the summary page
+        $.ajax({
+            url: summaryUrl,
+            success: function(data) {
+                // Extract the timeline panel and filter out the needed info
+                const $summaryCol3 = $(data).find('#timeline').html();
+                const { linkToRead, userName, hasOT, getBonus } = determineOT($summaryCol3);
+
+                // Insert the OT
+                const partyOT = hasOT ?
+                      `<div><b>OT:</b> <a href="${linkToRead}">${userName}</a></div>` :
+                '<div><b>OT:</b> None</div>';
+
+                const partyOTLoc = $partymon.nextAll('.tooltip_content').first().find('.fieldmontip').find('.item');
+
+                partyOTLoc.after(partyOT);
+            } // success function
+        }); // ajax
+    }) // each function
+
 }; // insertOT function
 
 
@@ -130,11 +166,9 @@ function insertOT() {
 const observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
         const fieldDiv = $('.field');
-        const currentPageUrl = window.location.href;
 
         // Making sure it only runs once using a class
-        if (!fieldDiv.hasClass('ot_inserted') &&
-           currentPageUrl.endsWith("fields") || currentPageUrl.endsWith("daycare")) {
+        if (!fieldDiv.hasClass('ot_inserted') && !currentPageUrl.includes('summary')) {
             fieldDiv.addClass('ot_inserted');
             insertOT();
         }
@@ -146,4 +180,8 @@ function setupObserver() {
         childList: true,
         subtree: true
     });
+
+    if (currentPageUrl.includes('summary')) {
+        insertOT();
+    }
 }
