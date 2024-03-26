@@ -6,12 +6,12 @@
 // @downloadURL  https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @updateURL    https://github.com/Vanyar92/pfq-small-addons/blob/main/pfq-small-addons.user.js
 // @description  Some small addons to Pokéfarm
-// @version      1.1.0
+// @version      1.1.1
 // @match        https://pokefarm.com/*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js
 // ==/UserScript==
 
-window.addEventListener('load', setupObserver)
+window.addEventListener('load', insertOT, setupObserver)
 
 // Variables
 let timelineEntries = $("#timeline li");
@@ -130,9 +130,11 @@ function insertOT() {
 const observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
         const fieldDiv = $('.field');
+        const currentPageUrl = window.location.href;
 
         // Making sure it only runs once using a class
-        if (!fieldDiv.hasClass('ot_inserted')) {
+        if (!fieldDiv.hasClass('ot_inserted') &&
+           currentPageUrl.endsWith("fields") || currentPageUrl.endsWith("daycare")) {
             fieldDiv.addClass('ot_inserted');
             insertOT();
         }
